@@ -1,0 +1,27 @@
+[
+  {
+    "ctx": 128,
+    "pp_tok_s": 62.46,
+    "prefill_ms": 2049.3
+  },
+  {
+    "ctx": 256,
+    "pp_tok_s": 62.93,
+    "prefill_ms": 4068.0
+  },
+  {
+    "ctx": 512,
+    "pp_tok_s": 63.88,
+    "prefill_ms": 8015.0
+  },
+  {
+    "ctx": 1024,
+    "pp_tok_s": 61.4,
+    "prefill_ms": 16677.5
+  },
+  {
+    "ctx": 2048,
+    "pp_tok_s": 57.61,
+    "prefill_ms": 35549.4
+  }
+]

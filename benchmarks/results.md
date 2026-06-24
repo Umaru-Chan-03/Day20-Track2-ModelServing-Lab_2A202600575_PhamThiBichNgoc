@@ -51,16 +51,23 @@ Pick one or two sweep results to highlight.
 ### Thread sweep
 | threads | tg128 (tok/s) |
 |--:|--:|
-| | |
+| 1 | 8.9 |
+| 2 | 14.5 |
+| 4 | 19.4 |
+| 8 | 20.5 |
+| 16 | 17.0 |
 
 ### Quant sweep
 | quant | size (MB) | tg128 (tok/s) |
 |:--|--:|--:|
-| | | |
+| Q2_K | 718.0 | 21.2 |
+| Q4_K_M | 1065.6 | 16.7 |
+| Q5_K_M | 1225.9 | 14.9 |
 
 ### The one change that mattered most
 
-_Two-to-three sentences. Be specific: what change, what the before/after numbers were, and why you think it worked. The grade weights this paragraph more than the raw numbers._
+Optimizing the CPU thread count (`-t`) was the single most impactful tuning step: setting thread count to 8 logical cores matched our CPU architecture and yielded a peak performance of 20.5 tok/s, which is a **2.3× speedup** over the single-thread baseline (8.9 tok/s). Pushing threads to 16 caused performance to drop to 17.0 tok/s as threads competed for memory bandwidth and CPU cache.
+
 
 ## Bonus — MLX (macOS only, optional)
 

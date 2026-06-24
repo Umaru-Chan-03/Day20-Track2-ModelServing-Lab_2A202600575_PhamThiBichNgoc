@@ -19,7 +19,7 @@ from pathlib import Path
 
 LLAMA_BENCH = Path("BONUS-llama-cpp-optimization/llama.cpp/build/bin/llama-bench")
 LLAMA_BENCH_EXE = LLAMA_BENCH.with_suffix(".exe")
-PP_RE = re.compile(r"\|\s*pp(\d+)\s*\|\s*([0-9.]+)\s*±")
+PP_RE = re.compile(r"\|\s*pp(\d+)\s*\|\s*([0-9.]+)")
 
 
 def find_bench() -> Path:

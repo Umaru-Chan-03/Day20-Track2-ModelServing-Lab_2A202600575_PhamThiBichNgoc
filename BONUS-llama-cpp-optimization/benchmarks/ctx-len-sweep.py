@@ -22,7 +22,7 @@ from pathlib import Path
 LLAMA_BENCH = Path("BONUS-llama-cpp-optimization/llama.cpp/build/bin/llama-bench")
 LLAMA_BENCH_EXE = LLAMA_BENCH.with_suffix(".exe")
 
-PP_RE = re.compile(r"\|\s*pp(\d+)\s*\|\s*([0-9.]+)\s*±")
+PP_RE = re.compile(r"\|\s*pp(\d+)\s*\|\s*([0-9.]+)")
 
 
 def find_bench() -> Path:
@@ -69,7 +69,7 @@ def main() -> int:
         # Prefill latency for ctx tokens at this rate, in ms:
         ms = (ctx / tps) * 1000.0 if tps > 0 else 0
         rows.append({"ctx": ctx, "pp_tok_s": tps, "prefill_ms": round(ms, 1)})
-        print(f"   ctx={ctx:5d}  pp={tps:7.1f} tok/s  prefill≈{ms:7.1f} ms")
+        print(f"   ctx={ctx:5d}  pp={tps:7.1f} tok/s  prefill~{ms:7.1f} ms")
 
     if not rows:
         print("ERROR: couldn't parse llama-bench output.", file=sys.stderr)

@@ -72,7 +72,7 @@ def main() -> int:
         print("ERROR: hardware.json not found. Run detect-hardware.py first.", file=sys.stderr)
         return 1
 
-    hw = json.loads(hw_path.read_text())
+    hw = json.loads(hw_path.read_text(encoding="utf-8"))
     tier_key = pick_tier(hw["recommendation"]["recommended_model"])
     repo_id, q4_file, q2_file = TIERS[tier_key]
 
@@ -106,7 +106,7 @@ def main() -> int:
         "primary_model": str(primary),
         "compare_model": str(compare),
     }
-    Path("models/active.json").write_text(json.dumps(config, indent=2))
+    Path("models/active.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
     print("\nWrote models/active.json — quickstart and bonus scripts read this.")
     return 0
 

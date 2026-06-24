@@ -15,6 +15,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 
 def run(cmd: list[str], timeout: int = 5) -> tuple[int, str]:
     try:
@@ -37,7 +40,7 @@ def detect_cpu() -> dict:
         info["apple_silicon"] = info["arch"] in ("arm64", "aarch64")
     elif sys_plat.startswith("linux"):
         try:
-            cpuinfo = Path("/proc/cpuinfo").read_text()
+            cpuinfo = Path("/proc/cpuinfo").read_text(encoding="utf-8")
             for line in cpuinfo.splitlines():
                 if line.startswith("model name"):
                     info["model"] = line.split(":", 1)[1].strip()
@@ -61,6 +64,23 @@ def detect_cpu() -> dict:
                 elif line.startswith("NumberOfCores="):
                     val = line.split("=", 1)[1].strip()
                     info["cores_physical"] = int(val) if val.isdigit() else None
+        if info.get("model", "unknown") == "unknown" or not info.get("cores_physical"):
+            rc, out = run(
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-Command",
+                    "(Get-CimInstance Win32_Processor | Select-Object -First 1 Name,NumberOfCores | ConvertTo-Json -Compress)",
+                ]
+            )
+            if rc == 0 and out.strip():
+                try:
+                    data = json.loads(out)
+                    info["model"] = data.get("Name") or info.get("model", "unknown")
+                    cores = data.get("NumberOfCores")
+                    info["cores_physical"] = int(cores) if cores else info.get("cores_physical")
+                except (json.JSONDecodeError, TypeError, ValueError):
+                    pass
     info.setdefault("model", "unknown")
     info.setdefault("cores_physical", info["cores_logical"])
     return info
@@ -73,7 +93,7 @@ def detect_ram_gb() -> float:
         return round(int(out.strip()) / 1024**3, 1) if rc == 0 and out.strip().isdigit() else 0.0
     if sys_plat.startswith("linux"):
         try:
-            for line in Path("/proc/meminfo").read_text().splitlines():
+            for line in Path("/proc/meminfo").read_text(encoding="utf-8").splitlines():
                 if line.startswith("MemTotal:"):
                     kb = int(line.split()[1])
                     return round(kb / 1024**2, 1)
@@ -86,6 +106,17 @@ def detect_ram_gb() -> float:
                 val = line.split("=", 1)[1].strip()
                 if val.isdigit():
                     return round(int(val) / 1024**3, 1)
+        rc, out = run(
+            [
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory",
+            ]
+        )
+        val = out.strip()
+        if rc == 0 and val.isdigit():
+            return round(int(val) / 1024**3, 1)
     return 0.0
 
 
@@ -231,7 +262,7 @@ def main() -> int:
         "docker": docker,
         "recommendation": rec,
     }
-    Path("hardware.json").write_text(json.dumps(out, indent=2))
+    Path("hardware.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
     print("\nSaved hardware.json — other lab scripts will read this.")
     return 0
 

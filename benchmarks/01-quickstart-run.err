@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\01-llama-cpp-quickstart\benchmark.py", line 218, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\01-llama-cpp-quickstart\benchmark.py", line 200, in main
+    primary = benchmark_model("primary (Q4_K_M)", active["primary_model"], hw)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\01-llama-cpp-quickstart\benchmark.py", line 121, in benchmark_model
+    llm = make_llm(path, n_threads, n_ctx, n_batch, n_gpu_layers)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\01-llama-cpp-quickstart\benchmark.py", line 67, in make_llm
+    return Llama(
+           ^^^^^^
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\.venv\Lib\site-packages\llama_cpp\llama.py", line 381, in __init__
+    internals.LlamaModel(
+  File "C:\Users\Admin\Day20-Track2-ModelServing-Lab\.venv\Lib\site-packages\llama_cpp\_internals.py", line 57, in __init__
+    model = llama_cpp.llama_model_load_from_file(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError -1073741795] Windows Error 0xc000001d

@@ -82,19 +82,22 @@ _Answer here._
 
 > **Most important section.** Pick **một** thay đổi từ bonus track (build flag, thread sweep, quant pick, GPU offload, KV-cache quantization, speculative decoding, bất cứ challenge nào trong `BONUS-llama-cpp-optimization/CHALLENGES.md`) đã tạo ra speedup lớn nhất trên máy bạn.
 
-**Change:** _<vd: rebuild llama.cpp với `-DGGML_NATIVE=ON -DGGML_BLAS=ON`; vd: hạ `-t` từ 12 xuống 6; vd: bật Metal trên M2>_
+**Change:** `Tối ưu hóa số lượng CPU thread (-t 8 so với -t 1)`
 
 **Before vs after** (paste 2-3 dòng từ sweep output):
 
 ```
-before: <số liệu>
-after:  <số liệu>
-speedup: ~<X.Y>×
+before: t=  1  tg64=   8.9 tok/s
+after:  t=  8  tg64=  20.5 tok/s
+speedup: ~2.30×
 ```
 
 **Tại sao nó work** (1–2 đoạn ngắn — đây là phần grader đọc kỹ nhất):
 
-_Giải thích như đang nói với một bạn cùng lớp đang ngồi cạnh. Tránh "vibes-based" reasoning — bám vào mô hình mental của hardware (memory bandwidth? compute? cache?). Nếu kết quả khác kỳ vọng từ deck, nói rõ — đó là phần grader thưởng điểm._
+Việc tăng số lượng luồng từ 1 lên 8 giúp tận dụng tốt hơn 4 nhân vật lý (8 nhân logic/luồng ảo) của CPU Intel i7-6820HQ để thực hiện song song các phép tính nhân ma trận (GEMM) trong quá trình tự hồi quy của mô hình. Một luồng đơn lẻ hoàn toàn không thể khai thác hết hiệu năng đa nhân cũng như băng thông RAM của hệ thống.
+
+Tuy nhiên, tốc độ giải mã không tăng tuyến tính theo số nhân (8 luồng chỉ đạt 20.5 tok/s, tăng 2.3× chứ không phải 8×) và sụt giảm đáng kể xuống còn 17.0 tok/s khi tăng lên 16 luồng (oversubscription). Điều này chứng minh quá trình sinh token (decode phase) cực kỳ bị giới hạn bởi băng thông bộ nhớ (memory-bandwidth bound) hơn là giới hạn tính toán (compute-bound). Khi chạy quá nhiều luồng ảo hoặc vượt quá cấu hình phần cứng thực tế, các nhân xử lý sẽ phải tranh chấp băng thông bus bộ nhớ RAM và làm mất dữ liệu cache liên tục (cache thrashing), dẫn tới thời gian chờ tăng và hiệu năng tổng thể bị sụt giảm.
+
 
 ---
 

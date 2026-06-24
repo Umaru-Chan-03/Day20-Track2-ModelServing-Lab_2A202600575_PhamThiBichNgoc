@@ -22,7 +22,7 @@ LLAMA_BENCH = Path("BONUS-llama-cpp-optimization/llama.cpp/build/bin/llama-bench
 LLAMA_BENCH_EXE = LLAMA_BENCH.with_suffix(".exe")
 
 # llama-bench prints a markdown-ish table; this regex grabs the tg128 (decode) row.
-TG_RE = re.compile(r"\|\s*tg128\s*\|\s*([0-9.]+)\s*±")
+TG_RE = re.compile(r"\|\s*tg64\s*\|\s*([0-9.]+)")
 
 
 def find_bench() -> Path:
@@ -35,11 +35,11 @@ def find_bench() -> Path:
 
 
 def load_active() -> str:
-    return json.loads(Path("models/active.json").read_text())["primary_model"]
+    return json.loads(Path("models/active.json").read_text(encoding="utf-8"))["primary_model"]
 
 
 def load_hw() -> dict:
-    return json.loads(Path("hardware.json").read_text())
+    return json.loads(Path("hardware.json").read_text(encoding="utf-8"))
 
 
 def thread_grid(hw: dict) -> list[int]:
@@ -103,8 +103,8 @@ def main() -> int:
         "drops as you go higher, that's the memory-bandwidth ceiling: extra threads "
         "fight over the same memory channels and slow each other down.\n"
     )
-    (out_dir / "bonus-thread-sweep.md").write_text(md)
-    (out_dir / "bonus-thread-sweep.json").write_text(json.dumps(rows, indent=2))
+    (out_dir / "bonus-thread-sweep.md").write_text(md, encoding="utf-8")
+    (out_dir / "bonus-thread-sweep.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
 
     print("\n" + md)
     return 0
